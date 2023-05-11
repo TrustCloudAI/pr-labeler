@@ -74,12 +74,14 @@ const assignLabelForLineChanges = async (tools, numberOfLines, labelConfig) => {
   let currentSizelabelExists = false;
 
   const element = labelConfig.find((elem) => numberOfLines <= elem.size);
+  tools.log.info(`Label to apply: ${element?.name}`);
 
   if (element) {
     await Promise.all(
       labelConfig.map(async (item) => {
         const { name } = item;
         if (await existsLabel(tools, name)) {
+          tools.log.info(`Label already exists, not adding`);
           if (element.name === name) {
             currentSizelabelExists = true;
           } else {
@@ -89,7 +91,9 @@ const assignLabelForLineChanges = async (tools, numberOfLines, labelConfig) => {
       }),
     );
 
+    tools.log.info(`currentSizeLabelExists = ${currentSizelabelExists}`);
     if (!currentSizelabelExists) {
+      tools.log.info(`Adding label ${element.name}`);
       await addLabel(tools, element.name);
     }
   }
