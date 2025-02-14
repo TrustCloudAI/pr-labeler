@@ -5,9 +5,7 @@
  */
 module.exports = async (tools, labelName) => {
   try {
-    const {
-      data: labelsForRepository,
-    } = await tools.github.issues.listLabelsForRepo({
+    const labelsForRepository = await tools.github.paginate(tools.github.issues.listLabelsForRepo, {
       ...tools.context.repo,
     });
 
