@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "actions-toolkit": "^4.0.0",
-    "dotenv": "^8.2.0"
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
