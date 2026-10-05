@@ -3,6 +3,7 @@ const addLabel = require('./github/add-label');
 const removeLabel = require('./github/remove-label');
 const existsLabel = require('./github/exists-label');
 const isAddedLabel = require('./github/is-added-label');
+const { countNonCommentChanges } = require('./comment-utils');
 
 const getLabelConfig = (tools) => {
   const labelConfig = [
@@ -59,8 +60,11 @@ const getNumberOfLines = async (tools) => {
         tools.log.info(`Excluding file from the counting ${file.filename}`);
         return accumulator;
       }
-      tools.log.info(`Adding file to the counting: ${file.filename} The number of lines is: ${file.changes}`);
-      return accumulator + file.changes;
+      const fileChanges = file.patch
+        ? countNonCommentChanges(file.patch, file.filename)
+        : file.changes;
+      tools.log.info(`Adding file to the counting: ${file.filename} Total changes: ${file.changes}, Non-comment changes: ${fileChanges}`);
+      return accumulator + fileChanges;
     }, 0);
     tools.log.info(`Number of lines changed: ${numberOfLines}`);
     return numberOfLines;
