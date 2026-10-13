@@ -3,6 +3,8 @@ const addLabel = require('./github/add-label');
 const removeLabel = require('./github/remove-label');
 const existsLabel = require('./github/exists-label');
 const isAddedLabel = require('./github/is-added-label');
+const getGitattributes = require('./github/get-gitattributes');
+const { parseGeneratedRules, isGenerated } = require('./gitattributes');
 const { countNonCommentChanges } = require('./comment-utils');
 
 const getLabelConfig = (tools) => {
@@ -55,9 +57,14 @@ const getNumberOfLines = async (tools) => {
       ...tools.context.repo,
       pull_number: tools.context.issue.number,
     });
+    const generatedRules = parseGeneratedRules(await getGitattributes(tools));
     const numberOfLines = files.reduce((accumulator, file) => {
       if (file.filename.match(tools.inputs.exclude_files)) {
         tools.log.info(`Excluding file from the counting ${file.filename}`);
+        return accumulator;
+      }
+      if (isGenerated(generatedRules, file.filename)) {
+        tools.log.info(`Excluding generated file from the counting ${file.filename}`);
         return accumulator;
       }
       const fileChanges = file.patch
