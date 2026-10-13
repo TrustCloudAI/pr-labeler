@@ -59,6 +59,12 @@ jobs:
 
 - PR size labeler consider as a change any kind of line addition, deletion, or modification
 - A PR will be labeled as `xl` if it exceeds the amount of changes defined as `l_max_size`
+- Files marked as generated in the repository's root `.gitattributes` (`linguist-generated` or `linguist-generated=true`) are excluded from the counting, in addition to `exclude_files`. For example:
+
+  ```gitattributes
+  package-lock.json linguist-generated
+  src/generated/** linguist-generated
+  ```
 
 ## License
 
