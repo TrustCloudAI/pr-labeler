@@ -29,7 +29,7 @@ const makeTools = ({ files, gitattributes, excludeFiles = '^$' }) => ({
   context: {
     repo: { owner: 'acme', repo: 'widgets' },
     issue: { number: 7 },
-    payload: { pull_request: { head: { sha: 'abc123' } } },
+    payload: { pull_request: { base: { sha: 'base456' }, head: { sha: 'abc123' } } },
   },
   log: { info: jest.fn() },
 });
@@ -61,6 +61,27 @@ describe('run-action', () => {
     await runAction(tools);
 
     expect(addLabel).toHaveBeenCalledWith(tools, 'size_l');
+  });
+
+  it('still labels the PR when .gitattributes has an invalid pattern', async () => {
+    const tools = makeTools({
+      files: [file('src/index.js', 5), file('dist/bundle.js', 900)],
+      gitattributes: 'file[z-a].ts linguist-generated\ndist/** linguist-generated\n',
+    });
+
+    await runAction(tools);
+
+    expect(addLabel).toHaveBeenCalledWith(tools, 'size_xs');
+  });
+
+  it('reads .gitattributes from the base commit, not the PR head', async () => {
+    const tools = makeTools({ files: [file('src/index.js', 5)], gitattributes: '' });
+
+    await runAction(tools);
+
+    expect(tools.github.repos.getContent).toHaveBeenCalledWith(
+      expect.objectContaining({ ref: 'base456' }),
+    );
   });
 
   it('still applies the exclude_files input', async () => {

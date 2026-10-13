@@ -94,6 +94,11 @@ describe('parseGeneratedRules', () => {
     expect(rules[0].pattern).toBe('gen files/*.ts');
   });
 
+  it('skips patterns that cannot be compiled instead of throwing', () => {
+    const rules = parseGeneratedRules('file[z-a].ts linguist-generated\n*.pb.go linguist-generated');
+    expect(rules.map((rule) => rule.pattern)).toEqual(['*.pb.go']);
+  });
+
   it('returns no rules for empty input', () => {
     expect(parseGeneratedRules('')).toEqual([]);
     expect(parseGeneratedRules(undefined)).toEqual([]);

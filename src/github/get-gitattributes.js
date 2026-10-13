@@ -1,5 +1,7 @@
 /**
- * Get the content of the root .gitattributes at the pull request head commit
+ * Get the content of the root .gitattributes at the pull request base commit.
+ * The base is used (not the head) so a PR cannot mark its own files as generated
+ * to shrink its size label.
  * @param {import('actions-toolkit').Toolkit} tools
  * @returns {Promise<string>} the file content, or an empty string if unavailable
  */
@@ -8,7 +10,7 @@ module.exports = async (tools) => {
     const { data } = await tools.github.repos.getContent({
       ...tools.context.repo,
       path: '.gitattributes',
-      ref: tools.context.payload.pull_request.head.sha,
+      ref: tools.context.payload.pull_request.base.sha,
     });
     if (!data || data.type !== 'file' || typeof data.content !== 'string') {
       return '';

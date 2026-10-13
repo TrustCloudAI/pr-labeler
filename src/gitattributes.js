@@ -94,8 +94,11 @@ const parseGeneratedRules = (content) => (content || '')
   .reduce((rules, line) => {
     const { pattern, attributes } = parseLine(line);
     const generated = attributes.map(generatedValue).filter((value) => value !== undefined).pop();
-    if (pattern && generated !== undefined) {
+    if (!pattern || generated === undefined) return rules;
+    try {
       rules.push({ pattern, regExp: globToRegExp(pattern), generated });
+    } catch (error) {
+      // Skip patterns that are not valid globs (e.g. "[z-a]"), as git does.
     }
     return rules;
   }, []);

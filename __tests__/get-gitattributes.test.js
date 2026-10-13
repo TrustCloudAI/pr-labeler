@@ -4,13 +4,13 @@ const makeTools = (getContent) => ({
   github: { repos: { getContent } },
   context: {
     repo: { owner: 'acme', repo: 'widgets' },
-    payload: { pull_request: { head: { sha: 'abc123' } } },
+    payload: { pull_request: { base: { sha: 'base456' }, head: { sha: 'abc123' } } },
   },
   log: { info: jest.fn() },
 });
 
 describe('getGitattributes', () => {
-  it('fetches .gitattributes at the PR head commit and decodes it', async () => {
+  it('fetches .gitattributes at the PR base commit and decodes it', async () => {
     const getContent = jest.fn().mockResolvedValue({
       data: {
         type: 'file',
@@ -25,7 +25,7 @@ describe('getGitattributes', () => {
       owner: 'acme',
       repo: 'widgets',
       path: '.gitattributes',
-      ref: 'abc123',
+      ref: 'base456',
     });
   });
 
